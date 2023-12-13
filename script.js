@@ -1,5 +1,7 @@
 'use strict';
 
+// const { render } = require("react-dom/cjs/react-dom.production.min");
+
 const btn = document.querySelector('.btn-country');
 const countriesContainer = document.querySelector('.countries');
 
@@ -44,7 +46,7 @@ const renderCountry = function (data, className = '') {
             </article>
         `;
     countriesContainer.insertAdjacentHTML('beforeend', html);
-    // countriesContainer.style.opacity = 1;
+    countriesContainer.style.opacity = 1;
 }
 
 const renderError = function (message) {
@@ -83,37 +85,37 @@ const renderError = function (message) {
 
 // getCountryAndNeighbour('portugal');
 
-const getJSON = function (url, errorMsg = 'Something went wrong') {
-    return fetch(url).then(response => {
-        if (!response.ok) {
-            throw new Error(`${errorMsg} ${response.status}`);
-        }
-        return response.json();
-    });
-};
+// const getJSON = function (url, errorMsg = 'Something went wrong') {
+//     return fetch(url).then(response => {
+//         if (!response.ok) {
+//             throw new Error(`${errorMsg} ${response.status}`);
+//         }
+//         return response.json();
+//     });
+// };
 
-const getCountryData = function (country) {
-    // Country 1
-    getJSON(`https://countries-api-836d.onrender.com/countries/name/${country}`,
-        'Country not found')
-        .then((data) => {
-            renderCountry(data[0]);
-            const neighbour = data[0].borders?.[0]
+// const getCountryData = function (country) {
+//     // Country 1
+//     getJSON(`https://countries-api-836d.onrender.com/countries/name/${country}`,
+//         'Country not found')
+//         .then((data) => {
+//             renderCountry(data[0]);
+//             const neighbour = data[0].borders?.[0]
 
-            if (!neighbour) throw new Error(`${country} has no neighbouring countries`);
+//             if (!neighbour) throw new Error(`${country} has no neighbouring countries`);
 
-            // Country 2
-            return getJSON(`https://countries-api-836d.onrender.com/countries/alpha/${neighbour}`, 'Country not found');
-        })
-        .then(data => renderCountry(data, 'neighbour'))
-        .catch(error => {
-            console.log(`${error} failed`)
-            renderError(`Something went wrong 💥💥💥 ${error.message}. Try again!`)
-        })
-        .finally(() => {
-            countriesContainer.style.opacity = 1;
-        })
-}
+//             // Country 2
+//             return getJSON(`https://countries-api-836d.onrender.com/countries/alpha/${neighbour}`, 'Country not found');
+//         })
+//         .then(data => renderCountry(data, 'neighbour'))
+//         .catch(error => {
+//             console.log(`${error} failed`)
+//             renderError(`Something went wrong 💥💥💥 ${error.message}. Try again!`)
+//         })
+//         .finally(() => {
+//             countriesContainer.style.opacity = 1;
+//         })
+// }
 
 // const getCountryData = function (country) {
 //     // Country 1
@@ -147,8 +149,124 @@ const getCountryData = function (country) {
 //         })
 // }
 
-btn.addEventListener('click', () => {
-    getCountryData('ireland');
-});
+// const getPosition = function () {
+//     return new Promise(function (resolve, reject) {
+//         navigator.geolocation.getCurrentPosition(resolve, reject)
+//     });
+// };
 
-getCountryData('australia');
+
+// const whereAmI = function () {
+
+//     getPosition()
+//         .then(position => {
+//             const { latitude: lat, longitude: lng } = position.coords;
+
+//             return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
+//         })
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error(`Country not found ${response.status}`)
+//             }
+//             return response.json();
+//         })
+//         .then(data => {
+//             console.log(`You are in ${data.city}, ${data.country}`);
+
+//             return fetch(`https://countries-api-836d.onrender.com/countries/name/${data.country}`)
+//         })
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error(`Country not found ${response.status}`)
+//             }
+//             return response.json();
+//         })
+//         .then(data => renderCountry(data[0]))
+//         .catch(error => {
+//             console.error(`${error.message}`)
+//         })
+// }
+
+// btn.addEventListener('click', whereAmI);
+
+// btn.addEventListener('click', () => {
+//     getCountryData('ireland');
+// });
+
+
+// const wait = function (seconds) {
+//     return new Promise((resolve, reject) => {
+//         setTimeout(resolve, seconds * 1000);
+//     });
+// };
+
+// const imgContainer = document.querySelector('.images');
+
+// const createImage = function (imgPath) {
+//     return new Promise((resolve, reject) => {
+//         const img = document.createElement('img');
+//         img.src = imgPath;
+
+//         img.addEventListener('load', () => {
+//             imgContainer.append(img);
+//             resolve(img)
+//         });
+
+//         img.addEventListener('error', function () {
+//             reject(new Error('Image not found'))
+//         })
+//     })
+// }
+
+// let currentImg;
+// createImage('img/img-1.jpg')
+//     .then(img => {
+//         currentImg = img;
+//         console.log('image 1 loaded');
+//         return wait(2)
+//     })
+//     .then(() => {
+//         currentImg.style.display = 'none';
+//         return createImage('img/img-2.jpg');
+//     })
+//     .then(img => {
+//         currentImg = img;
+//         console.log('Image 2 loaded')
+//         return wait(2);
+//     })
+//     .then(() => {
+//         currentImg.style.display = 'none';
+//         return createImage('img/img-3.jpg');
+//     })
+//     .then((img) => {
+//         currentImg = img;
+//         console.log('image 3 loaded')
+//         return wait(2);
+//     })
+//     .then(() => {
+//         currentImg.style.display = 'none';
+//     })
+//     .catch(err => { console.error(err) });
+
+const getPosition = function () {
+    return new Promise(function (resolve, reject) {
+        navigator.geolocation.getCurrentPosition(resolve, reject)
+    });
+};
+
+const whereAmI = async function () {
+    // Geoloaction
+    const position = await getPosition()
+    const { latitude: lat, longitude: lng } = position.coords;
+    //Reverse geo coding
+    const geoCode = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    const dataGeo = await geoCode.json()
+
+    //Country data
+    const response = await fetch(`https://countries-api-836d.onrender.com/countries/name/${dataGeo.country}`)
+    const data = await response.json()
+    console.log(data);
+    renderCountry(data[0]);
+}
+
+whereAmI()
