@@ -44,7 +44,12 @@ const renderCountry = function (data, className = '') {
             </article>
         `;
     countriesContainer.insertAdjacentHTML('beforeend', html);
-    countriesContainer.style.opacity = 1;
+    // countriesContainer.style.opacity = 1;
+}
+
+const renderError = function (message) {
+    countriesContainer.insertAdjacentText('afterend', message);
+    // countriesContainer.style.opacity = 1;
 }
 
 // const getCountryAndNeighbour = function (country) {
@@ -78,19 +83,72 @@ const renderCountry = function (data, className = '') {
 
 // getCountryAndNeighbour('portugal');
 
+const getJSON = function (url, errorMsg = 'Something went wrong') {
+    return fetch(url).then(response => {
+        if (!response.ok) {
+            throw new Error(`${errorMsg} ${response.status}`);
+        }
+        return response.json();
+    });
+};
+
 const getCountryData = function (country) {
     // Country 1
-    fetch(`https://countries-api-836d.onrender.com/countries/name/${country}`)
-        .then((response) => response.json())
+    getJSON(`https://countries-api-836d.onrender.com/countries/name/${country}`,
+        'Country not found')
         .then((data) => {
             renderCountry(data[0]);
             const neighbour = data[0].borders?.[0]
 
+            if (!neighbour) throw new Error(`${country} has no neighbouring countries`);
+
             // Country 2
-            return fetch(`https://countries-api-836d.onrender.com/countries/alpha/${neighbour}`)
+            return getJSON(`https://countries-api-836d.onrender.com/countries/alpha/${neighbour}`, 'Country not found');
         })
-        .then(response => response.json())
-        .then(data => renderCountry(data, 'neighbour'));
+        .then(data => renderCountry(data, 'neighbour'))
+        .catch(error => {
+            console.log(`${error} failed`)
+            renderError(`Something went wrong 💥💥💥 ${error.message}. Try again!`)
+        })
+        .finally(() => {
+            countriesContainer.style.opacity = 1;
+        })
 }
 
-getCountryData('ireland');
+// const getCountryData = function (country) {
+//     // Country 1
+//     fetch(`https://countries-api-836d.onrender.com/countries/name/${country}`)
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error(`Country not found (${response.status})`)
+//             }
+//             return response.json();
+//         })
+//         .then((data) => {
+//             renderCountry(data[0]);
+//             const neighbour = data[0].borders?.[0]
+
+//             // Country 2
+//             return fetch(`https://countries-api-836d.onrender.com/countries/alpha/${neighbour}`)
+//         })
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error(`Country not found (${response.status})`)
+//             }
+//             return response.json()
+//         })
+//         .then(data => renderCountry(data, 'neighbour'))
+//         .catch(error => {
+//             console.log(`${error} failed`)
+//             renderError(`Something went wrong 💥💥💥 ${error.message}. Try again!`)
+//         })
+//         .finally(() => {
+//             countriesContainer.style.opacity = 1;
+//         })
+// }
+
+btn.addEventListener('click', () => {
+    getCountryData('ireland');
+});
+
+getCountryData('australia');
