@@ -51,7 +51,7 @@ const renderCountry = function (data, className = '') {
 
 const renderError = function (message) {
     countriesContainer.insertAdjacentText('afterend', message);
-    // countriesContainer.style.opacity = 1;
+    countriesContainer.style.opacity = 1;
 }
 
 // const getCountryAndNeighbour = function (country) {
@@ -255,18 +255,25 @@ const getPosition = function () {
 };
 
 const whereAmI = async function () {
-    // Geoloaction
-    const position = await getPosition()
-    const { latitude: lat, longitude: lng } = position.coords;
-    //Reverse geo coding
-    const geoCode = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
-    const dataGeo = await geoCode.json()
+    try {
+        // Geoloaction
+        const position = await getPosition()
+        const { latitude: lat, longitude: lng } = position.coords;
+        //Reverse geo coding
+        const geoCode = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+        if (!geoCode.ok) throw new Error('Error! AAAAAAGGHHH')
+        const dataGeo = await geoCode.json()
 
-    //Country data
-    const response = await fetch(`https://countries-api-836d.onrender.com/countries/name/${dataGeo.country}`)
-    const data = await response.json()
-    console.log(data);
-    renderCountry(data[0]);
+        //Country data
+        const response = await fetch(`https://countries-api-836d.onrender.com/countries/name/${dataGeo.country}`)
+        if (!geoCode.ok) throw new Error('Error! AAAAAAGGHHH')
+        const data = await response.json()
+        console.log(data);
+        renderCountry(data[0]);
+    } catch (error) {
+        console.error(error)
+        renderError(`💥💥 ${error.message}`);
+    }
 }
 
 whereAmI()
