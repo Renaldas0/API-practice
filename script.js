@@ -270,10 +270,31 @@ const whereAmI = async function () {
         const data = await response.json()
         console.log(data);
         renderCountry(data[0]);
+
+        return `You are in ${dataGeo.city}, ${dataGeo.country}`
     } catch (error) {
         console.error(error)
         renderError(`💥💥 ${error.message}`);
-    }
-}
 
-whereAmI()
+        // Reject promise returned from async function
+        throw error;
+    };
+};
+
+console.log('Will get location');
+
+// whereAmI()
+//     .then(city => console.log(`${city}`))
+//     .catch(error => console.error(`${error}`))
+//     .finally(() => console.log('Finished getting location'));
+
+(async function () {
+    try {
+        const city = await whereAmI()
+        console.log(city)
+    }
+    catch (error) {
+        console.error(`${error}`)
+    }
+    console.log('Finished getting location')
+})();
