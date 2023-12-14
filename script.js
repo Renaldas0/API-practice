@@ -85,14 +85,14 @@ const renderError = function (message) {
 
 // getCountryAndNeighbour('portugal');
 
-// const getJSON = function (url, errorMsg = 'Something went wrong') {
-//     return fetch(url).then(response => {
-//         if (!response.ok) {
-//             throw new Error(`${errorMsg} ${response.status}`);
-//         }
-//         return response.json();
-//     });
-// };
+const getJSON = function (url, errorMsg = 'Something went wrong') {
+    return fetch(url).then(response => {
+        if (!response.ok) {
+            throw new Error(`${errorMsg} ${response.status}`);
+        }
+        return response.json();
+    });
+};
 
 // const getCountryData = function (country) {
 //     // Country 1
@@ -298,3 +298,63 @@ console.log('Will get location');
     }
     console.log('Finished getting location')
 })();
+
+const get3Countries = async function (c1, c2, c3) {
+    try {
+
+        const data = await Promise.all([
+            await getJSON(`https://countries-api-836d.onrender.com/countries/name/${c1}`),
+            await getJSON(`https://countries-api-836d.onrender.com/countries/name/${c2}`),
+            await getJSON(`https://countries-api-836d.onrender.com/countries/name/${c3}`)
+        ]);
+
+        console.log(data.map(c => c[0].capital));
+
+        // console.log([data1.capital, data2.capital, data3.capital]);
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+get3Countries('portugal', 'canada', 'tanzania');
+
+// Promise.race
+(async function () {
+    const response = await Promise.race([
+        getJSON(`https://countries-api-836d.onrender.com/countries/name/italy`),
+        getJSON(`https://countries-api-836d.onrender.com/countries/name/mexico`),
+        getJSON(`https://countries-api-836d.onrender.com/countries/name/egypt`)
+    ]);
+    console.log(response[0]);
+})();
+
+const timeout = function (sec) {
+    return new Promise(function (_, reject) {
+        setTimeout(function () {
+            reject(new Error('request took too long'))
+        }, sec * 1000)
+    })
+};
+
+Promise.race([getJSON(`https://countries-api-836d.onrender.com/countries/name/egypt`), timeout(5)
+])
+    .then(res => console.log(res))
+    .catch(error => console.error(error));
+
+
+// Promise.allSettled
+Promise.allSettled([
+    Promise.resolve('Success'),
+    Promise.reject('Failed'),
+    Promise.resolve('Success')
+]).then(res => console.log(res))
+    .catch(error => console.error(error));
+
+
+// Promise.any
+Promise.any([
+    Promise.resolve('Success'),
+    Promise.reject('Failed'),
+    Promise.resolve('Success')
+]).then(res => console.log(res))
+    .catch(error => console.error(error));
